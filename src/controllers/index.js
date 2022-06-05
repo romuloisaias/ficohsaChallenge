@@ -1,6 +1,7 @@
 const matrixDNAS = require("../functions/functions");
 // const conexion = require("../connection/connection");
 const client = require("../connection/postgresqlconn");
+client.connect();
 
 const isMutant = async (req, res, next) => {
   try {
@@ -57,24 +58,14 @@ const isMutant = async (req, res, next) => {
         }
       }
     }
-    console.log(JSON.stringify(req.body.dna));
-    console.log(
-      `INSERT INTO dna.dna (dna, mutant) VALUES( '${JSON.stringify(
-        req.body
-      )}', ${flagMutant})`
-    );
-    client.connect();
-    client
+    await client
       .query(
         `INSERT INTO dna.dna (dna, mutant) VALUES( '${JSON.stringify(
           req.body
         )}', ${flagMutant})`
       )
-      .then((response) => {
-        console.log(response.rows);
-        client.end();
-      })
       .catch((err) => {
+        console.log(err);
         client.end();
       });
     // conexion.query(
@@ -95,14 +86,12 @@ const isMutant = async (req, res, next) => {
   }
 };
 
-const stats = (req, res) => {
+const stats = async (req, res) => {
   try {
-    // let query = "SELECT * FROM dna";
-    client.connect();
     let result = {};
     let mutants = 0;
     let humans = 0;
-    client
+    await client
       .query("SELECT * FROM dna.dna")
       .then((response) => {
         response.rows.forEach((data) => {
@@ -116,9 +105,9 @@ const stats = (req, res) => {
         result.count_human_dna = humans;
         result.ratio = parseInt(mutants) / parseInt(humans);
         res.status(200).send(result);
-        client.end();
       })
       .catch((err) => {
+        console.log(err);
         client.end();
       });
 
