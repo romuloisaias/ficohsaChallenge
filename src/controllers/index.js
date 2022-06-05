@@ -1,5 +1,6 @@
 const matrixDNAS = require("../functions/functions");
-const conexion = require("../connection/connection");
+// const conexion = require("../connection/connection");
+const client = require("../connection/postgresqlconn");
 
 const isMutant = async (req, res, next) => {
   try {
@@ -57,13 +58,32 @@ const isMutant = async (req, res, next) => {
       }
     }
     console.log(JSON.stringify(req.body.dna));
-    conexion.query(
-      "INSERT INTO dna (dna, mutant) VALUES(?, ?)",
-      [JSON.stringify(req.body.dna), flagMutant],
-      function (error, results, fields) {
-        if (error) throw error;
-      }
+    console.log(
+      `INSERT INTO dna.dna (dna, mutant) VALUES( '${JSON.stringify(
+        req.body
+      )}', ${flagMutant})`
     );
+    client.connect();
+    client
+      .query(
+        `INSERT INTO dna.dna (dna, mutant) VALUES( '${JSON.stringify(
+          req.body
+        )}', ${flagMutant})`
+      )
+      .then((response) => {
+        console.log(response.rows);
+        client.end();
+      })
+      .catch((err) => {
+        client.end();
+      });
+    // conexion.query(
+    //   "INSERT INTO dna (dna, mutant) VALUES(?, ?)",
+    //   [JSON.stringify(req.body.dna), flagMutant],
+    //   function (error, results, fields) {
+    //     if (error) throw error;
+    //   }
+    // );
 
     if (flagMutant) {
       res.status(200).end("OK");
@@ -77,25 +97,45 @@ const isMutant = async (req, res, next) => {
 
 const stats = (req, res) => {
   try {
-    let query = "SELECT * FROM dna";
-    let response = {};
+    // let query = "SELECT * FROM dna";
+    client.connect();
+    let result = {};
     let mutants = 0;
     let humans = 0;
-
-    conexion.query(query, (err, rows) => {
-      if (err) throw err;
-      rows.forEach((data) => {
-        if (data.mutant) {
-          mutants++;
-        } else {
-          humans++;
-        }
+    client
+      .query("SELECT * FROM dna.dna")
+      .then((response) => {
+        response.rows.forEach((data) => {
+          if (data.mutant) {
+            mutants++;
+          } else {
+            humans++;
+          }
+        });
+        result.count_mutants_dna = mutants;
+        result.count_human_dna = humans;
+        result.ratio = parseInt(mutants) / parseInt(humans);
+        res.status(200).send(result);
+        client.end();
+      })
+      .catch((err) => {
+        client.end();
       });
-      response.count_mutants_dna = mutants;
-      response.count_human_dna = humans;
-      response.ratio = parseInt(mutants) / parseInt(humans);
-      res.status(200).send(response);
-    });
+
+    // conexion.query(query, (err, rows) => {
+    //   if (err) throw err;
+    //   rows.forEach((data) => {
+    //     if (data.mutant) {
+    //       mutants++;
+    //     } else {
+    //       humans++;
+    //     }
+    //   });
+    //   response.count_mutants_dna = mutants;
+    //   response.count_human_dna = humans;
+    //   response.ratio = parseInt(mutants) / parseInt(humans);
+    //   res.status(200).send(response);
+    // });
   } catch (error) {
     throw new Error(error);
   }
