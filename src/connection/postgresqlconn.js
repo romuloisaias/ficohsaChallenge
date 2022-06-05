@@ -7,6 +7,9 @@ const connectionData = {
   password: "ad6945ab866dc16709db3b692b20ca6ba83756b1958e33c9a8969c9c0aad5227",
   port: 5432,
   URI: "postgres://zkfpflriwzgkul:ad6945ab866dc16709db3b692b20ca6ba83756b1958e33c9a8969c9c0aad5227@ec2-3-211-221-185.compute-1.amazonaws.com:5432/dardnfg7fcl5cv",
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 const client = new Client(connectionData);
 
