@@ -4,14 +4,14 @@
 
 * npm
 * node v 16.15.0
-* mysql
+* postgresql
 * git
 
 ## Instalacion
 
 * Descargar el proyecto a un directorio local https://github.com/romuloisaias/ficohsaChallenge.git * instalar con npm install
 * Ejecutar con npm test
-* Ejecutar script.sql de la carpeta sql en mysql
+* Ejecutar script.sql de la carpeta sql en postgresql
 
 *Ej:*
 
