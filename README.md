@@ -10,7 +10,9 @@
 ## Instalacion
 
 * Descargar el proyecto a un directorio local https://github.com/romuloisaias/ficohsaChallenge.git * instalar con npm install
-* Ejecutar con npm test
+* Ejecutar con npm test para nodemon
+* Ejecutar con npm start para node
+* Ejecutar con npm mocha para unit tests
 * Ejecutar script.sql de la carpeta sql en postgresql
 
 *Ej:*
